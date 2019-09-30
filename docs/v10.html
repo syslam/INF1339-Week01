@@ -1,0 +1,174 @@
+<html>
+<head>
+<title>version 9</title>
+<style>
+    .standardTable {
+        border: solid;
+        border-collapse: collapse;}
+    .blackbox {
+        border: solid;
+        height: 200px;
+        width: 100px;
+        text-align: center;
+        background-color: black;
+        border-color: white;
+        color: yellow;
+        vertical-align: top;}
+    .sevenSegmentTable {
+        border: none;}
+    .notsevenSegmentTable {border: none;
+        width: 10px; height: 10px;}
+    .horizontal {width: 40px; height: 10px;}
+    .vertical {width: 10px; height: 40px;}
+    .illuminatedSegment {
+        border: none;
+        background-color: red;}
+</style>
+<script>
+    function display(number) {
+        //change decimal number into a binary
+        var bin = dec2bin(number)
+        
+        //send binary number to function bin2ssd()
+        var ssd = bin2ssd(bin)
+        
+        //send ssd signals to function illuminate_segments()
+        var lights = illuminate(ssd)
+    }
+    
+    function dec2bin(decimal) {
+        var quotient = decimal
+        var output = ''
+        while (quotient > 0) {
+            // the % operator is "divide and report remainder"
+            remainder = quotient % 2
+        if (remainder == 1)
+            {output = '1' + output}
+        else 
+            {output = '0' + output}
+        quotient = Math.floor(quotient/2)
+        }
+        while (output.length < 4) {output = '0' + output}
+            // pads the output with leading '0' as needed
+        return (output)
+    }
+    
+    function bin2ssd(binary) {
+        //convert the four bit input string into w,x,y,z variables
+        var w = false //set them all to false at first then change if input is '1'
+        var x = false
+        var y = false
+        var z = false
+        if (binary[0] == '1') {w = true}
+        if (binary[1] == '1') {x = true}
+        if (binary[2] == '1') {y = true}
+        if (binary[3] == '1') {z = true}
+        
+        //"compute" the value of logical expression for each segment
+        // our expression for A was ~wxz + w~x~y + ~x~y~z + ~wy
+        var a = !w&x&z || w&!x&!y || !w&!x&!z || !w&y
+        var b = !w&!y&!z ||!w&!x&!y ||!w&y&z ||!w&!x&y || w&!x&!y
+        var c = !w&!y ||!w&x&y || !w&y&z || w&!x&!y
+        var d = !x&!y&!z ||!w&x&!y&z || !w&y&!z || !w&!x&y || w&!x&!y
+        var e = !x&!y&!z || !w&y&!z
+        var f = !w&!y&!z || !w&x&!y || !w&x&!z || w&!x&!y
+        var g = !w&x&!y || !w&y&!z || !w&!x&y || w&!x&!y
+        
+        //assemble and return the output
+        //we will build up the output string element by element
+        var output = ''
+        if (a) {output = output + '1'} else {output = output + '0'}
+        if (b) {output = output + '1'} else {output = output + '0'}
+        if (c) {output = output + '1'} else {output = output + '0'}
+        if (d) {output = output + '1'} else {output = output + '0'}
+        if (e) {output = output + '1'} else {output = output + '0'}
+        if (f) {output = output + '1'} else {output = output + '0'}
+        if (g) {output = output + '1'} else {output = output + '0'}
+        return (output) //initial default just illuminates segment A
+    }
+    
+    function illuminate(signals) {
+        if (signals[0] == '1') {
+            document.getElementById("segmentA").className = "illuminatedSegment horizontal"}
+        else {document.getElementById("segmentA").className = "sevenSegmentTable horizontal"}
+        if (signals[1] == '1') {
+            document.getElementById("segmentB").className = "illuminatedSegment vertical"}
+        else {document.getElementById("segmentB").className = "sevenSegmentTable vertical"}
+        if (signals[2] == '1') {
+            document.getElementById("segmentC").className = "illuminatedSegment vertical"}
+        else {document.getElementById("segmentC").className = "sevenSegmentTable vertical"}
+        if (signals[3] == '1') {
+            document.getElementById("segmentD").className = "illuminatedSegment horizontal"}
+        else {document.getElementById("segmentD").className = "sevenSegmentTable horizontal"}
+        if (signals[4] == '1') {
+            document.getElementById("segmentE").className = "illuminatedSegment vertical"}
+        else {document.getElementById("segmentE").className = "sevenSegmentTable vertical"}
+        if (signals[5] == '1') {
+            document.getElementById("segmentF").className = "illuminatedSegment vertical"}
+        else {document.getElementById("segmentF").className = "sevenSegmentTable vertical"}
+        if (signals[6] == '1') {
+            document.getElementById("segmentG").className = "illuminatedSegment horizontal"}
+        else {document.getElementById("segmentG").className = "sevenSegmentTable horizontal"}
+    }
+    
+</script>
+</head>
+    <body>
+        <h3>Version 9 Illuminate Segments</h3>
+        <table class="standardTable">
+            <tr>
+                <td class="blackbox"><h3>Keypad</h3>
+                    <button type="button" onclick="display(1)">1</button>
+                    <button type="button" onclick="display(2)">2</button>
+                    <button type="button" onclick="display(3)">3</button>
+                    <button type="button" onclick="display(4)">4</button>
+                    <button type="button" onclick="display(5)">5</button>
+                    <button type="button" onclick="display(6)">6</button>
+                    <button type="button" onclick="display(7)">7</button>
+                    <button type="button" onclick="display(8)">8</button>
+                    <button type="button" onclick="display(9)">9</button>
+                    <button type="button" onclick="display(0)">0</button>
+                </td>
+                
+                <td class="blackbox">
+                    <h3>Decimal to Binary</h3>
+                </td>
+                
+                <td class="blackbox">
+                    <h3>Binary to SSD Signals</h3>
+                </td>
+                
+                <td class="blackbox">
+                    <h3>Illuminate Segments</h3>
+                    <table align=center>
+                        <tr>
+                            <td class="notsevenSegmentTable"></td>
+                            <td id="segmentA" class="sevenSegmentTable horizontal"></td>
+                            <td class="notsevenSegmentTable"></td>
+                        </tr>
+                        <tr>
+                            <td id="segmentF" class="sevenSegmentTable vertical"></td>
+                            <td class="notsevenSegmentTable"></td>
+                            <td id="segmentB" class="sevenSegmentTable vertical"></td>
+                        </tr>
+                        <tr>
+                            <td class="notsevenSegmentTable"></td>
+                            <td id="segmentG" class="sevenSegmentTable horizontal"></td>
+                            <td class="notsevenSegmentTable"></td>
+                        </tr>
+                        <tr>
+                            <td id="segmentE" class="sevenSegmentTable vertical"></td>
+                            <td class="notsevenSegmentTable"></td>
+                            <td id="segmentC" class="sevenSegmentTable vertical"></td>
+                        </tr>
+                        <tr>
+                            <td class="notsevenSegmentTable"></td>
+                            <td id="segmentD" class="sevenSegmentTable horizontal"></td>
+                            <td class="notsevenSegmentTable"></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+</html>
